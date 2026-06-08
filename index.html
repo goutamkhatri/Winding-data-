@@ -3,62 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Winding Master Pro - Maa Bhagawati Electrical</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Maa Bhagwati Electrical - Register</title>
     <style>
-        body { font-family: 'Mukta', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .card { background-color: #1e293b; border-left: 4px solid #f97316; cursor: pointer; }
-        .input-field { background: #334155; border: 1px solid #475569; color: white; border-radius: 8px; padding: 10px; width: 100%; outline: none; }
-        .modal-bg { background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(8px); }
-        .bg-pic { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.4; z-index: 0; }
-        .content-overlay { position: relative; z-index: 10; background: linear-gradient(to bottom, rgba(30, 41, 59, 0.5), rgba(15, 23, 42, 0.9)); padding: 20px; border-radius: 16px; height: 100%; overflow-y: auto; }
+        :root { --p: #2c3e50; --s: #3498db; --g: #27ae60; --r: #e74c3c; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f3f5; margin: 0; padding-bottom: 90px; }
+        header { background: var(--p); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .container { padding: 12px; }
+
+        /* Clean List Style */
+        .list-item { background: white; padding: 15px; margin-bottom: 8px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--s); cursor: pointer; }
+        .list-item span { font-weight: bold; color: var(--p); font-size: 16px; }
+        .list-item small { color: #888; font-size: 11px; }
+        
+        /* Details Section (Accordion) */
+        .details { display: none; background: #fff; padding: 15px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0; border-top: none; margin-top: -10px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+        .data-box { background: #f8f9fa; padding: 8px; border-radius: 5px; text-align: center; border: 1px solid #eee; }
+        .label { font-size: 10px; color: #888; display: block; text-transform: uppercase; font-weight: bold; }
+        .val { font-size: 13px; font-weight: bold; color: #333; }
+
+        .section-h { background: #eef2f7; padding: 5px 10px; font-size: 12px; font-weight: bold; border-radius: 4px; margin: 10px 0; color: var(--p); border-left: 3px solid var(--s); }
+
+        /* Image Gallery */
+        .img-grid { display: flex; overflow-x: auto; gap: 10px; margin-top: 10px; padding-bottom: 5px; }
+        .img-grid img { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; flex-shrink: 0; }
+
+        /* Form / Modal */
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; overflow-y: auto; }
+        .form-container { padding: 20px; }
+        input, select { width: 100%; padding: 12px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        .row { display: flex; gap: 10px; }
+        
+        .fab { position: fixed; bottom: 20px; right: 20px; background: var(--g); color: white; border: none; width: 65px; height: 65px; border-radius: 50%; font-size: 35px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 200; outline: none; }
+        .save-btn { background: var(--g); color: white; padding: 15px; border: none; width: 100%; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 10px; }
+        .action-btn { border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
-<body class="p-4 pb-32">
+<body>
 
-    <header class="text-center mb-6">
-        <h1 class="text-3xl font-bold text-orange-500">Winding Master</h1>
-        <p class="text-xs text-slate-400 uppercase">Maa Bhagawati Electrical, Sagona</p>
-    </header>
+<header>
+    <h2 style="margin:0">Maa Bhagwati Electrical</h2>
+    <small>स्मार्ट वाइंडिंग रजिस्टर</small>
+</header>
 
-    <div class="mb-6 sticky top-2 z-10">
-        <input type="text" id="searchInput" placeholder="सर्च मोटर (नाम से)..." class="input-field shadow-2xl" onkeyup="searchMotor()">
+<div class="container">
+    <input type="text" id="search" placeholder="मोटर का नाम सर्च करें..." onkeyup="render()" style="width:100%; padding:15px; border-radius:30px; border:1px solid #ddd; margin-bottom:20px; outline:none; font-size:16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+    <div id="list"></div>
+</div>
+
+<button class="fab" onclick="openForm()">+</button>
+
+<div id="modal">
+    <div class="form-container">
+        <h2 id="ftitle">नई वाइंडिंग एंट्री</h2>
+        <input type="hidden" id="eid">
+        
+        <label style="font-weight:bold;">मोटर का नाम</label>
+        <input type="text" id="name" placeholder="उदा: Texmo 1HP Crompton">
+        
+        <div class="section-h">स्टेटर साइज (Stator Size)</div>
+        <div class="row">
+            <input type="text" id="idSize" placeholder="I.D.">
+            <input type="text" id="odSize" placeholder="O.D.">
+            <input type="text" id="coreSize" placeholder="CORE Size">
+        </div>
+
+        <div class="section-h">रनिंग डेटा (Running Winding)</div>
+        <div class="row">
+            <input type="text" id="rGage" placeholder="SWG गेज">
+            <input type="text" id="rTurn" placeholder="Turns टर्न">
+            <input type="text" id="rLen" placeholder="Coil Size लंबाई">
+        </div>
+
+        <div class="section-h">स्टार्टिंग डेटा (Starting Winding)</div>
+        <div class="row">
+            <input type="text" id="sGage" placeholder="SWG गेज">
+            <input type="text" id="sTurn" placeholder="Turns टर्न">
+            <input type="text" id="sLen" placeholder="Coil Size लंबाई">
+        </div>
+
+        <div class="section-h">अन्य विवरण (Capacitor & Connection)</div>
+        <div class="row">
+            <input type="text" id="cap" placeholder="Capacitor MFD">
+            <input type="text" id="conn" placeholder="Connection (Star/Delta/Series)">
+        </div>
+
+        <div class="section-h">फोटो अपलोड (अधिकतम 5)</div>
+        <input type="file" id="picsInput" accept="image/*" multiple onchange="handlePics(this)">
+        <div id="p-prev" class="img-grid"></div>
+
+        <button class="save-btn" onclick="save()">सुरक्षित करें</button>
+        <button onclick="closeForm()" style="width:100%; background:none; border:none; color:var(--r); margin-top:15px; font-weight:bold; font-size:16px;">वापस जाएँ</button>
     </div>
+</div>
 
-    <div id="motorList" class="space-y-4"></div>
+<script>
+    // डेटाबेस लोड करना
+    let db = JSON.parse(localStorage.getItem('mb_final_list_db')) || [];
+    let tempPics = [];
 
-    <button onclick="openForm()" class="fixed bottom-24 right-6 w-16 h-16 bg-orange-500 rounded-full shadow-lg text-4xl flex items-center justify-center z-40 active:scale-90 transition">+</button>
+    // क्लिक करने पर विवरण को खोलना या बंद करना (Accordion)
+    function toggleDetails(id) {
+        let el = document.getElementById('det-' + id);
+        let allDetails = document.querySelectorAll('.details');
+        
+        // पुरानी खुली हुई डिटेल्स बंद करें ताकि स्क्रीन साफ़ रहे
+        allDetails.forEach(d => { if(d.id !== 'det-'+id) d.style.display = 'none'; });
+        
+        // करंट विवरण को चालू/बंद करें
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
 
-    <div class="fixed bottom-0 left-0 right-0 bg-slate-900 p-4 flex gap-3 border-t border-slate-700 z-40">
-        <button onclick="exportData()" class="flex-grow bg-blue-600 text-white py-3 rounded-xl font-bold text-sm">💾 बैकअप लें</button>
-        <button onclick="document.getElementById('importFile').click()" class="flex-grow bg-green-600 text-white py-3 rounded-xl font-bold text-sm">📥 फाइल लोड करें</button>
-        <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
-    </div>
+    // बड़ी इमेज को कंप्रेस करके छोटा करने का फंक्शन (ताकि मेमोरी फुल न हो)
+    function handlePics(input) {
+        const files = input.files;
+        if (files.length > 5) { alert("कृपया अधिकतम 5 फोटो ही चुनें!"); input.value = ""; return; }
+        
+        tempPics = []; 
+        document.getElementById('p-prev').innerHTML = ""; 
 
-    <div id="entryModal" class="fixed inset-0 modal-bg hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 w-full max-w-lg rounded-2xl p-6 overflow-y-auto max-h-[90vh] shadow-2xl border border-slate-700">
-            <h2 id="modalTitle" class="text-2xl font-bold mb-4 text-orange-400 border-b border-slate-700 pb-2">नया डेटा जोड़ें</h2>
-            <form id="windingForm" class="space-y-4 text-sm">
-                <input type="hidden" id="editId" value="">
-                
-                <input type="text" id="motorName" placeholder="मोटर का नाम" class="input-field" required>
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="idSize" placeholder="ID (अंदर का साइज)" class="input-field">
-                    <input type="text" id="odSize" placeholder="OD (बाहर का साइज)" class="input-field">
-                    <input type="text" id="stamping" placeholder="स्टांपिंग साइज" class="input-field">
-                    <input type="number" id="slots" placeholder="कुल स्लॉट" class="input-field">
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const maxW = 500; // मोबाइल स्क्रीन के लिए पर्याप्त चौड़ाई
+                    const scale = maxW / img.width;
+                    canvas.width = maxW;
+                    canvas.height = img.height * scale;
+                    
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6); // 60% क्वालिटी कंप्रेस
+                    
+                    tempPics.push(compressedBase64);
+                    
+                    // फॉर्म में तुरंत प्रीव्यू दिखाना
+                    const previewImg = document.createElement('img');
+                    previewImg.src = compressedBase64;
+                    document.getElementById('p-prev').appendChild(previewImg);
+                };
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // फॉर्म खोलना (नया और एडिट दोनों के लिए)
+    function openForm(editId = null) {
+        document.getElementById('modal').style.display = 'block';
+        resetForm();
+        if(editId) {
+            let i = db.find(x => x.id == editId);
+            document.getElementById('ftitle').innerText = "डेटा सुधारें (Edit)";
+            document.getElementById('eid').value = i.id;
+            document.getElementById('name').value = i.name;
+            document.getElementById('idSize').value = i.idSize;
+            document.getElementById('odSize').value = i.odSize;
+            document.getElementById('coreSize').value = i.coreSize;
+            document.getElementById('rGage').value = i.rGage;
+            document.getElementById('rTurn').value = i.rTurn;
+            document.getElementById('rLen').value = i.rLen;
+            document.getElementById('sGage').value = i.sGage;
+            document.getElementById('sTurn').value = i.sTurn;
+            document.getElementById('sLen').value = i.sLen;
+            document.getElementById('cap').value = i.cap;
+            document.getElementById('conn').value = i.conn;
+            tempPics = i.pics || [];
+            tempPics.forEach(p => {
+                const img = document.createElement('img');
+                img.src = p;
+                document.getElementById('p-prev').appendChild(img);
+            });
+        } else {
+            document.getElementById('ftitle').innerText = "नई वाइंडिंग एंट्री";
+        }
+    }
+
+    function closeForm() { document.getElementById('modal').style.display = 'none'; }
+    
+    function resetForm() {
+        document.getElementById('eid').value = '';
+        document.querySelectorAll('.form-container input').forEach(i => { if(i.type != 'file') i.value = ''; });
+        document.getElementById('picsInput').value = "";
+        document.getElementById('p-prev').innerHTML = "";
+        tempPics = [];
+    }
+
+    // डेटा सुरक्षित (Save) करना + Duplicate चेक
+    function save() {
+        let name = document.getElementById('name').value.trim();
+        let core = document.getElementById('coreSize').value.trim();
+        if(!name) { alert("मोटर का नाम लिखना जरूरी है!"); return; }
+        
+        let editId = document.getElementById('eid').value;
+
+        // Duplicate Check: अगर नया डेटा है, तो चेक करें कि नाम और कोर साइज सेम तो नहीं है
+        if(!editId) {
+            let exists = db.some(x => x.name.toLowerCase() === name.toLowerCase() && x.coreSize === core);
+            if(exists) { alert("यह मोटर और कोर साइज का डेटा पहले से सुरक्षित है!"); return; }
+        }
+
+        let data = {
+            id: editId ? parseInt(editId) : Date.now(),
+            name,
+            idSize: document.getElementById('idSize').value,
+            odSize: document.getElementById('odSize').value,
+            coreSize: core,
+            rGage: document.getElementById('rGage').value,
+            rTurn: document.getElementById('rTurn').value,
+            rLen: document.getElementById('rLen').value,
+            sGage: document.getElementById('sGage').value,
+            sTurn: document.getElementById('sTurn').value,
+            sLen: document.getElementById('sLen').value,
+            cap: document.getElementById('cap').value,
+            conn: document.getElementById('conn').value,
+            pics: tempPics,
+            date: new Date().toLocaleDateString('hi-IN')
+        };
+
+        if(editId) {
+            let idx = db.findIndex(x => x.id == editId);
+            db[idx] = data;
+        } else {
+            db.push(data);
+        }
+
+        try {
+            localStorage.setItem('mb_final_list_db', JSON.stringify(db));
+            closeForm();
+            render();
+            alert("डेटा सफलतापूर्वक सुरक्षित हो गया!");
+        } catch(e) {
+            alert("मेमोरी फुल हो गई है! कृपया कुछ पुराना डेटा डिलीट करें।");
+        }
+    }
+
+    // होम स्क्रीन पर केवल नाम की लिस्ट दिखाना
+    function render() {
+        let s = document.getElementById('search').value.toLowerCase();
+        let list = document.getElementById('list');
+        list.innerHTML = '';
+        
+        let filtered = db.filter(x => x.name.toLowerCase().includes(s));
+        
+        if(filtered.length === 0) {
+            list.innerHTML = '<p style="text-align:center; color:gray; margin-top:20px;">कोई रिकॉर्ड नहीं मिला।</p>';
+            return;
+        }
+
+        filtered.reverse().forEach(i => {
+            let imgHtml = (i.pics || []).map(p => `<img src="${p}" onclick="window.open(this.src)">`).join('');
+            
+            list.innerHTML += `
+            <div class="list-item" onclick="toggleDetails(${i.id})">
+                <span>${i.name}</span>
+                <small>तारीख: ${i.date}</small>
+            </div>
+            
+            <div id="det-${i.id}" class="details">
+                <div class="section-h">स्टेटर विवरण (Stator Measurements)</div>
+                <div class="grid-3">
+                    <div class="data-box"><span class="label">I.D.</span><span class="val">${i.idSize || '-'}</span></div>
+                    <div class="data-box"><span class="label">O.D.</span><span class="val">${i.odSize || '-'}</span></div>
+                    <div class="data-box"><span class="label">CORE</span><span class="val">${i.coreSize || '-'}</span></div>
                 </div>
                 
-                <label class="block text-slate-400 text-xs">मोटर की फोटो चुनें (Optional):</label>
-                <input type="file" id="photoInput" accept="image/*" class="input-field">
+                <div class="section-h">रनिंग: SWG ${i.rGage || '-'} | Turns: ${i.rTurn || '-'} | Size: ${i.rLen || '-'}</div>
+                <div class="section-h">स्टार्टिंग: SWG ${i.sGage || '-'} | Turns: ${i.sTurn || '-'} | Size: ${i.sLen || '-'}</div>
                 
-                <div class="bg-blue-900/20 p-3 rounded-xl border border-blue-500/30">
-                    <p class="text-blue-400 font-bold mb-2 uppercase text-[10px]">Running Coil (रनिंग)</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="text" id="rSWG" placeholder="SWG" class="input-field">
-                        <input type="text" id="rTurns" placeholder="Turns" class="input-field">
-                        <input type="text" id="rWeight" placeholder="वजन (ग्राम)" class="input-field">
+                <div class="grid-3" style="margin-top:10px;">
+                    <div class="data-box" style="grid-column: span 2"><span class="label">CAPACITOR</span><span class="val">${i.cap || '-'} MFD</span></div>
+                    <div class="data-box"><span class="label">CONNECTION</span><span class="val">${i.conn || '-'}</span></div>
+                </div>
+                
+                <div class="img-grid">${imgHtml}</div>
+                
+                <div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px; display:flex; justify-content:space-between;">
+                    <button class="action-btn" style="background:#eee; color:#333;" onclick="event.stopPropagation(); openForm(${i.id});">Edit</button>
+                    <button class="action-btn" style="background:none; color:var(--r);" onclick="event.stopPropagation(); del(${i.id});">Delete</button>
+                </div>
+            </div>`;
+        });
+    }
+
+    // डिलीट फंक्शन
+    function del(id) {
+        if(confirm('क्या आप सचमुच इस रिकॉर्ड को हटाना चाहते हैं?')) {
+            db = db.filter(x => x.id != id);
+            localStorage.setItem('mb_final_list_db', JSON.stringify(db));
+            render();
+        }
+    }
+    
+    // पहली बार ऐप चालू होने पर लिस्ट दिखाना
+    render();
+</script>
+</body>
+</html>
                         <input type="text" id="rLength" placeholder="फरमा लंबाई" class="input-field">
                     </div>
                 </div>
